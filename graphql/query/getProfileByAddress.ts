@@ -8,12 +8,36 @@ query Profile($address: EthereumAddress!) {
     name
     bio
     picture {
+      ... on NftImage {
+        contractAddress
+        tokenId
+        uri
+        chainId
+        verified
+      }
       ... on MediaSet {
         original {
           url
+          mimeType
         }
       }
     }
+    coverPicture {
+      ... on NftImage {
+        contractAddress
+        tokenId
+        uri
+        chainId
+        verified
+      }
+      ... on MediaSet {
+        original {
+          url
+          mimeType
+        }
+      }
+    }
+    ownedBy
     handle
   }
 }
@@ -29,6 +53,8 @@ async function getProfileByAddress(address: string): Promise<Profile | null> {
       address,
     })
     .toPromise();
+
+  console.log("default profile", response.data)
 
   return response.data.defaultProfile as Profile | null;
 }
