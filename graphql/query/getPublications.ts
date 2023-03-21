@@ -15,6 +15,11 @@ export const getPublicationsQuery = `
           ...MirrorFields
         }
       }
+      pageInfo {
+        prev
+        next
+        totalCount
+      }
     }
   }
   fragment MediaFields on Media {
@@ -349,16 +354,32 @@ fragment ReferenceModuleFields on ReferenceModule {
  * Load a user's publications by their profile id.
  */
 async function getPublications(profileId: string): Promise<any> {
-  const response = await basicClient
-    .query(getPublicationsQuery, {
-        request: {
-            profileId,
-            publicationTypes: ['POST']
-        }
-    })
-    .toPromise();
+    let entries = []
+    const response = await basicClient
+        .query(getPublicationsQuery, {
+            request: {
+                profileId,
+                publicationTypes: ['POST']
+            }
+        })
+        .toPromise();
+    entries = response.data.publications.items
+    let cursor = response.data.publications.pageInfo.next
 
-  return response.data.publications.items as any[];
+    while (cursor !== null) {
+        let response = await basicClient.query(getPublicationsQuery, {
+            request: {
+                profileId,
+                publicationTypes: ['POST'],
+                cursor
+            }
+        }).toPromise()
+        cursor = response.data.publications.pageInfo.next
+        entries.push(...response.data.publications.items)
+    }
+    console.log(entries)
+
+  return entries as any[];
 }
 
 export default getPublications;

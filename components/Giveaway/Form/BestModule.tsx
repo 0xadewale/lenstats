@@ -1,13 +1,14 @@
-import {Component, useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import Select from "../../ui/Select";
 import Profile from "../../../types/Profile";
-import {ethers} from "ethers";
-import {useAddress, useContract, useTokenBalance, useTransferToken} from "@thirdweb-dev/react";
-import {ERC20ABI} from "../../../const/abis";
+import { useAddress, useContract, useTokenBalance, useTransferToken, useTransferBatchToken } from "@thirdweb-dev/react";
+import { ERC20ABI } from "../../../const/abis";
+import FollowerProfile from "../../../types/FollowerProfile";
 
 type Props = {
     address: string,
-    winner: Profile,
+    winner: Profile|null,
+    winners: FollowerProfile[]|null,
     label: string,
     currencies: any
 }
@@ -27,15 +28,10 @@ export default function BestModule(props: Props) {
     const { contract } = useContract(selectedCurrency.address, ERC20ABI);
     const { data: tokenBalance } = useTokenBalance(contract, address)
     const { mutate: transferTokens } = useTransferToken(contract);
-
-    useEffect(() => {
-    }, [tokenBalance])
+    const { mutate: transferBatchTokens } = useTransferBatchToken(contract);
 
     const handleCurrencySelected = async (currency: any) => {
         setSelectedCurrency(currency)
-        // const bal = await getBalance(currency, props.address)
-        // setBalance(bal)
-        // validate(amount, balance)
     }
 
     const handleAmountChange = (e: any) => {
@@ -54,27 +50,30 @@ export default function BestModule(props: Props) {
         }
     }
 
-    const send = async (to: string | undefined, amount: number) => {
-        // const provider = new providers.Web3Provider(window.ethereum);
-        // const signer = provider.getSigner()
-        // const tokenContract = new ethers.Contract(currency.address, ABI, provider)
-//
-        // const parsedAmount = ethers.utils.parseUnits(amount, currency.decimals)
-        // const contractWithSigner = await tokenContract.connect(signer)
-//
-        // try {
-        //     let tx = await contractWithSigner.transfer(to, parsedAmount)
-        //     await tx.wait()
-        // } catch (e) {
-        //     console.log(e)
-        // }
+    const giveaway = async () => {
+        if (valid) {
+            if (props.winner !== null) {
+                await transferTokens(
+                    {
+                        to: props.winner.ownedBy,
+                        amount
+                    }
+                )
+            }
+            if (props.winners !== null) {
+                const data = props.winners.map((winner: any) => {
+                    return {
+                        to: winner.wallet.defaultProfile.ownedBy,
+                        amount: Number(amount)
+                    }
+                })
+                console.log(data)
+                await transferBatchTokens(data)
+            }
+        }
     }
 
-    const handleSend = async () => {
-        await send(props.winner?.ownedBy, amount)
-    }
-
-    if (!props.winner) {
+    if (!props.winner && !props.winners) {
         return (
             <div>No { props.label }</div>
         )
@@ -106,7 +105,7 @@ export default function BestModule(props: Props) {
             <div className="flex mt-4 z-10">
                 <button
                     className={`w-auto sm:w-full btn btn-success ${valid ? '' : 'btn-disabled'}`}
-                    onClick={() => transferTokens({to: props.winner.ownedBy, amount})}
+                    onClick={() => giveaway()}
                 >Giveaway</button>
             </div>
         </div>

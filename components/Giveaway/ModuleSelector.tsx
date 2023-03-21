@@ -20,17 +20,17 @@ const plans = [
     },
     {
         id: 4,
-        name: 'x Followers',
+        name: 'Random Followers',
         description: 'Reward an amount of random followers'
     },
     {
         id: 5,
-        name: 'x Collectors',
+        name: 'Random Collectors',
         description: 'Reward an amount of random collectors'
     },
     {
         id: 6,
-        name: 'x Commentary',
+        name: 'Random Commentary',
         description: 'Reward an amount of random commentaries'
     }
 ]
@@ -67,7 +67,7 @@ export default class ModuleSelector extends Component<Props, Stat> {
 
     render () {
         return (
-            <div>
+            <div className="mb-6">
                 {this.props.selected ? (
                     <div
                         onClick={this.openModal}

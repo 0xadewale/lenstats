@@ -284,7 +284,7 @@ export default function ProfilePage() {
                 <MediaRenderer
                     src={profile.coverPicture.original.url}
                     style={{objectFit: "cover"}}
-                    className="w-full h-72"
+                    className="w-full h-72 bg-red-500"
                 />
             ) : (
                 <div className="w-full h-64 bg-gray-600"></div>

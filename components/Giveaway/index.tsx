@@ -2,23 +2,36 @@ import {CURRENCIES} from '../../constants'
 import useLensUser from '../../util/useLensUser'
 import {useQuery} from '@tanstack/react-query'
 import getPublications from '../../graphql/query/getPublications'
-import {useEffect, useState} from "react";
+import getFollowers from "../../graphql/query/getFollowers";
+import {SetStateAction, useEffect, useState} from "react";
 import {getStats} from "../../graphql/query/getStats";
 import Profile from "../../types/Profile";
-import { MediaRenderer, useAddress } from "@thirdweb-dev/react";
+import FollowerProfile from "../../types/FollowerProfile";
+import {MediaRenderer, useAddress} from "@thirdweb-dev/react";
 import ModuleSelector from "./ModuleSelector";
 import BestModule from "./Form/BestModule";
 
 export default function Giveaway() {
-    const [bestCollector, setBestCollector] = useState<{ profile: Profile, amount: number } | null>()
-    const [bestCommentator, setBestCommentator] = useState<{ profile: Profile, amount: number } | null>()
+    const [bestCollector, setBestCollector] = useState<{ profile: Profile } | null>()
+    const [bestCommentator, setBestCommentator] = useState<{ profile: Profile } | null>()
+    const [randomFollowers, setRandomFollowers] = useState<FollowerProfile[] | null>(null)
     const [selected, setSelected] = useState<{ id: number, name: string } | null>();
-    const {profile, isSignedIn } = useLensUser()
+    const [winnerCount, setWinnerCount] = useState(0);
+    const {profile, isSignedIn} = useLensUser()
     const address = useAddress();
 
-    const { data: publications } = useQuery(
+    const {data: publications} = useQuery(
         ["publications"],
         () => getPublications(profile?.id as string),
+        {
+            // Only run this query if the profile is loaded
+            enabled: !!profile,
+        }
+    )
+
+    const {data: followers} = useQuery(
+        ["followers"],
+        () => getFollowers(profile?.id as string),
         {
             // Only run this query if the profile is loaded
             enabled: !!profile,
@@ -36,6 +49,25 @@ export default function Giveaway() {
 
     function handleSelected(item: any) {
         setSelected(item)
+    }
+
+    function handleWinnerCountChange(e: any) {
+        setWinnerCount(e.target.value)
+    }
+
+    function draw() {
+        if (selected && followers && selected.id) {
+            if (selected.id === 4) {
+                const items: SetStateAction<FollowerProfile[] | null> = []
+                while (items.length < winnerCount) {
+                    const random = Math.floor(Math.random() * followers.length)
+                    if (!items.includes(followers[random])) {
+                        items.push(followers[random])
+                    }
+                }
+                setRandomFollowers(items)
+            }
+        }
     }
 
     if (!address || !isSignedIn) {
@@ -57,9 +89,29 @@ export default function Giveaway() {
                     <p className="py-6">Select a giveaway module to reward your community</p>
                     {
                         bestCollector && bestCommentator ? (
-                            <ModuleSelector onSelect={handleSelected} selected={selected} />
+                            <>
+                                <ModuleSelector onSelect={handleSelected} selected={selected} />
+                            </>
                         ) : (
                             <progress className="progress w-56"></progress>
+                        )
+                    }
+                    {
+                        (selected?.id === 3 || selected?.id === 4 || selected?.id === 5 || selected?.id === 6) && (
+                            <>
+                                <div className="flex items-center justify-between">
+                                    <div>Number of winners</div>
+                                </div>
+                                <input type='number' className="input w-full" onChange={handleWinnerCountChange} />
+                                <div className="flex mt-4">
+                                    <button
+                                        className={`w-full btn btn-success`}
+                                        onClick={() => {
+                                            draw()
+                                        }}
+                                    >Draw</button>
+                                </div>
+                            </>
                         )
                     }
                 </div>
@@ -104,6 +156,33 @@ export default function Giveaway() {
                             </div>
                         )
                     }
+                    {
+                        selected?.id === 4 && randomFollowers && (
+                            <div className="py-4 px-2 rounded-xl bg-base-300">
+                                <div className="flex flex-col items-start gap-4 max-h-64 overflow-y-auto">
+                                    {
+                                        randomFollowers.map((follower, index) => (
+                                            <div key={index} className="flex items-center gap-2">
+                                                {
+                                                    follower.wallet.defaultProfile.picture && follower.wallet.defaultProfile.picture.original ? (
+                                                        <MediaRenderer
+                                                            src={follower.wallet.defaultProfile.picture.original.url}
+                                                            alt="user profile picture"
+                                                            className="rounded-full object-cover w-12 h-12"
+                                                        />
+                                                    ) : (
+                                                        <div className="bg-base-300 w-12 h-12 rounded-full"></div>
+                                                    )
+                                                }
+                                                <div className="font-semibold text-center">
+                                                    { follower.wallet.defaultProfile.name || follower.wallet.defaultProfile.handle  }</div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </div>
+                        )
+                    }
                     {(() => {
                         if (selected) {
                             switch (selected.id) {
@@ -112,6 +191,7 @@ export default function Giveaway() {
                                         return <BestModule
                                             label={selected.name}
                                             winner={bestCollector.profile}
+                                            winners={null}
                                             address={address}
                                             currencies={CURRENCIES}
                                         />
@@ -122,6 +202,18 @@ export default function Giveaway() {
                                         return <BestModule
                                             label={selected.name}
                                             winner={bestCommentator.profile}
+                                            winners={null}
+                                            address={address}
+                                            currencies={CURRENCIES}
+                                        />
+                                    }
+                                    break;
+                                case 4:
+                                    if (bestCommentator) {
+                                        return <BestModule
+                                            label={selected.name}
+                                            winner={null}
+                                            winners={randomFollowers}
                                             address={address}
                                             currencies={CURRENCIES}
                                         />
