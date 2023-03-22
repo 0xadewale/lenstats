@@ -1,4 +1,5 @@
 import { basicClient } from "../initClient";
+import Publication from "../../types/Publication";
 
 export const getPublicationsQuery = `
   query Publications($request: PublicationsQueryRequest!) {
@@ -353,7 +354,7 @@ fragment ReferenceModuleFields on ReferenceModule {
 /**
  * Load a user's publications by their profile id.
  */
-async function getPublications(profileId: string): Promise<any> {
+async function getPublications(profileId: string): Promise<Publication[]> {
     let entries = []
     const response = await basicClient
         .query(getPublicationsQuery, {
@@ -377,9 +378,10 @@ async function getPublications(profileId: string): Promise<any> {
         cursor = response.data.publications.pageInfo.next
         entries.push(...response.data.publications.items)
     }
+    console.log('publications')
     console.log(entries)
 
-  return entries as any[];
+  return entries as Publication[];
 }
 
 export default getPublications;

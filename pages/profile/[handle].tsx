@@ -127,13 +127,15 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    getStats(publications).then((response) => {
-      if (response) {
-        setBestCollector(response.bestCollector)
-        setBestCommentator(response.bestCommentator)
-      }
-    })
-  }, [publications])
+    if (publications?.length) {
+      getStats(publications).then((response) => {
+        if (response) {
+          setBestCollector(response.bestCollector)
+          setBestCommentator(response.bestCommentator)
+        }
+      })
+    }
+  }, [publications, loadingPublications])
 
   useEffect(() => {
     if (profile) {

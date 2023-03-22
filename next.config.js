@@ -7,7 +7,8 @@ const nextConfig = {
     domains: [
       'ipfs.infura.io',
       'statics-polygon-lens-staging.s3.eu-west-1.amazonaws.com',
-      'lens.infura-ipfs.io'
+      'lens.infura-ipfs.io',
+      'media.orb.ac'
     ]
   },
   async rewrites() {

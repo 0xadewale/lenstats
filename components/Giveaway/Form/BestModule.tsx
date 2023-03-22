@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import Select from "../../ui/Select";
 import Profile from "../../../types/Profile";
-import { useAddress, useContract, useTokenBalance, useTransferToken, useTransferBatchToken } from "@thirdweb-dev/react";
+import {
+    useAddress,
+    useContract,
+    useTokenBalance,
+    useTransferToken,
+    useTransferBatchToken,
+    Web3Button
+} from "@thirdweb-dev/react";
 import { ERC20ABI } from "../../../const/abis";
 import FollowerProfile from "../../../types/FollowerProfile";
 
@@ -27,8 +34,8 @@ export default function BestModule(props: Props) {
     const address = useAddress()
     const { contract } = useContract(selectedCurrency.address, ERC20ABI);
     const { data: tokenBalance } = useTokenBalance(contract, address)
-    const { mutate: transferTokens } = useTransferToken(contract);
-    const { mutate: transferBatchTokens } = useTransferBatchToken(contract);
+    const { mutateAsync: transferTokens } = useTransferToken(contract);
+    const { mutateAsync: transferBatchTokens } = useTransferBatchToken(contract);
 
     const handleCurrencySelected = async (currency: any) => {
         setSelectedCurrency(currency)
@@ -107,6 +114,23 @@ export default function BestModule(props: Props) {
                     className={`w-auto sm:w-full btn btn-success ${valid ? '' : 'btn-disabled'}`}
                     onClick={() => giveaway()}
                 >Giveaway</button>
+                <Web3Button
+                    contractAddress={selectedCurrency.address}
+                    action={() =>
+                        transferBatchTokens([
+                            {
+                                to: "0x5f831bBC519d0a13Fc70a5F0AAFc3e01E81d071a", // Transfer 10 tokens to a wallet
+                                amount: 0.1,
+                            },
+                            {
+                                to: "0x9197822DaaD536Cd94993b6E41617eFE2A7c431f", // Transfer 20 tokens to another wallet
+                                amount: 0.1,
+                            },
+                        ])
+                    }
+                >
+                    Transfer Batch Tokens
+                </Web3Button>
             </div>
         </div>
     )
