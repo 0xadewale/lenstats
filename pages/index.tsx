@@ -60,9 +60,39 @@ export default function Home() {
             <div className="stat-value">{ numberWithSpaces(data.totalFollows) }</div>
           </div>
 
+          <div className="stat lg:hidden">
+            <div className="stat-figure text-secondary mt-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
+              </svg>
+            </div>
+            <div className="stat-title">Mirrors</div>
+            <div className="stat-value">{ numberWithSpaces(data.totalMirrors) }</div>
+          </div>
+
+          <div className="stat lg:hidden">
+            <div className="stat-figure text-secondary mt-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 6.878V6a2.25 2.25 0 012.25-2.25h7.5A2.25 2.25 0 0118 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 004.5 9v.878m13.5-3A2.25 2.25 0 0119.5 9v.878m0 0a2.246 2.246 0 00-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0121 12v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6c0-.98.626-1.813 1.5-2.122" />
+              </svg>
+            </div>
+            <div className="stat-title">Collect</div>
+            <div className="stat-value">{ numberWithSpaces(data.totalCollects) }</div>
+          </div>
+
+          <div className="stat lg:hidden">
+            <div className="stat-figure text-secondary mt-4">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+              </svg>
+            </div>
+            <div className="stat-title">Comments</div>
+            <div className="stat-value">{ numberWithSpaces(data.totalComments) }</div>
+          </div>
+
         </div>
 
-        <div className="stats stats-vertical lg:shadow lg:bg-base-200 lg:stats-horizontal lg:my-4">
+        <div className="hidden lg:flex stats lg:shadow lg:bg-base-200 lg:stats-horizontal lg:my-4">
 
           <div className="stat">
             <div className="stat-figure text-secondary mt-4">

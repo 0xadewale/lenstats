@@ -39,12 +39,14 @@ export default function Giveaway() {
     )
 
     useEffect(() => {
-        getStats(publications).then((response) => {
-            if (response) {
-                setBestCollector(response.bestCollector)
-                setBestCommentator(response.bestCommentator)
-            }
-        })
+        if (publications) {
+            getStats(publications).then((response) => {
+                if (response) {
+                    setBestCollector(response.bestCollector)
+                    setBestCommentator(response.bestCommentator)
+                }
+            })
+        }
     }, [publications])
 
     function handleSelected(item: any) {
